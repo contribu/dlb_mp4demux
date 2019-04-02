@@ -17,7 +17,7 @@
  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
  * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************************************/
@@ -81,7 +81,7 @@ es_writer_destroy(es_sink_t p_es_sink)
 */
 static uint32_t
 write_bits(uint32_t pos,   /* buffer offset (in bits) */
-           unsigned char *buffer, 
+           unsigned char *buffer,
            uint32_t num_bits,   /* must be <= 16 */
            uint16_t data)
 {
@@ -117,7 +117,7 @@ write_bits(uint32_t pos,   /* buffer offset (in bits) */
  */
 static uint32_t
 read_bits(uint32_t *pos,   /* buffer offset in bits */
-          const unsigned char *buffer, 
+          const unsigned char *buffer,
           uint32_t num_bits)
 {
     uint32_t data = 0;
@@ -125,10 +125,10 @@ read_bits(uint32_t *pos,   /* buffer offset in bits */
     uint32_t bit = *pos % 8;
 
     while (num_bits > 0)
-    { 
+    {
         data = data << 1;
         data |= ((buffer[byte] >> (7 - bit)) & 1);
-        
+
         num_bits--;
         (*pos)++;
         bit++;
@@ -191,7 +191,7 @@ ddp_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_name,
             folder_len = (int)strlen(output_folder);
             n -=  folder_len;
         }
-        
+
         if (track_ID > 0)
         {
             ASSURE( snprintf(filename + folder_len, n, "out_%" PRIu32 ".ec3", track_ID) < n,
@@ -212,7 +212,7 @@ cleanup:
 }
 
 int
-es_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_name, const char *output_folder)
+es_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_name, const char *output_folder, const char *extension)
 {
     es_writer_t p_es_writer;
     int err = 0;
@@ -236,15 +236,15 @@ es_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_name, 
             folder_len = (int)strlen(output_folder);
             n -=  folder_len;
         }
-        
+
         if (track_ID > 0)
         {
-            ASSURE( snprintf(filename + folder_len, n, "out_%" PRIu32 ".dat", track_ID) < n,
+            ASSURE( snprintf(filename + folder_len, n, "out_%" PRIu32 "%s", track_ID, extension) < n,
                     (" "));
         }
         else
         {
-            ASSURE( snprintf(filename + folder_len, n, "%s.dat", stream_name) < n,
+            ASSURE( snprintf(filename + folder_len, n, "%s%s", stream_name, extension) < n,
                     (" "));
         }
         p_es_writer->out_file = fopen(filename, "wb");
@@ -352,7 +352,7 @@ ac4_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_name,
             folder_len = (int)strlen(output_folder);
             n -=  folder_len;
         }
-        
+
         if (track_ID > 0)
         {
             ASSURE( snprintf(filename + folder_len, n, "out_%" PRIu32 ".ac4", track_ID) < n,
@@ -445,7 +445,7 @@ sample_print_sample_ready(es_sink_t p_es_sink,
            sample->num_subsamples,
            sample->pic_type,
            sample->dependency_level);
-    
+
     return 0;
 }
 
@@ -463,7 +463,7 @@ sample_print_subsample_ready(uint32_t subsample_index,
     if (p_sample->num_subsamples > 1)
     {
         logout(LOG_VERBOSE_LVL_INFO,"DEMUX: Subsample: track_ID = %" PRIu32
-               ": sample_pos = %" PRIu64 
+               ": sample_pos = %" PRIu64
                ", position = %" PRIu64
                ", size = %" PRIu32
                ", subsample index = %" PRIu32
@@ -506,7 +506,7 @@ sample_print_new(es_sink_t *p_es_sink, uint32_t media_time_scale, uint32_t track
 cleanup:
     return err;
 }
-    
+
 
 typedef struct adts_writer_t_
 {
@@ -592,10 +592,10 @@ adts_writer_sample_entry(es_sink_t p_es_sink,
         /* p_entry->dsi is the esds box. Parse through, in order to read
            the Audio Specific Config (should this parsing move to the demuxer (excl ASC))?
         */
-    
+
         ASSURE( p_entry->dsi != NULL, ("Missing decoder specific info") );
         logout(LOG_VERBOSE_LVL_INFO,"version = %d\n", read_bits(&pos, p_entry->dsi, 24));
-        logout(LOG_VERBOSE_LVL_INFO,"flags = %d\n",   read_bits(&pos, p_entry->dsi, 8));  
+        logout(LOG_VERBOSE_LVL_INFO,"flags = %d\n",   read_bits(&pos, p_entry->dsi, 8));
 
         /* ES_Descriptor */
         logout(LOG_VERBOSE_LVL_INFO,"desc tag = %d\n", read_bits(&pos, p_entry->dsi, 8));
@@ -606,7 +606,7 @@ adts_writer_sample_entry(es_sink_t p_es_sink,
             size = (size << 7) | read_bits(&pos, p_entry->dsi, 7);
         } while (next_byte);
         logout(LOG_VERBOSE_LVL_INFO,"desc size = %d\n", size);
-    
+
         logout(LOG_VERBOSE_LVL_INFO,"ES_ID = %d\n", read_bits(&pos, p_entry->dsi, 16));
         ASSURE( read_bits(&pos, p_entry->dsi, 1) == 0, ("streamDependenceFlag is not 0") );
         url_flag = read_bits(&pos, p_entry->dsi, 1);
@@ -649,7 +649,7 @@ adts_writer_sample_entry(es_sink_t p_es_sink,
         logout(LOG_VERBOSE_LVL_INFO,"DecSpecificInfo size = %d\n", size);
 
         p_adts_writer->sample_entries[i].AOT = read_bits(&pos, p_entry->dsi, 5);
-        logout(LOG_VERBOSE_LVL_INFO,"track_ID %d: esds: AOT = %d\n", 
+        logout(LOG_VERBOSE_LVL_INFO,"track_ID %d: esds: AOT = %d\n",
                p_adts_writer->track_ID,
                p_adts_writer->sample_entries[i].AOT);
         ASSURE( p_adts_writer->sample_entries[i].AOT < 31,
@@ -657,7 +657,7 @@ adts_writer_sample_entry(es_sink_t p_es_sink,
 
         p_adts_writer->sample_entries[i].frequency_index = read_bits(&pos, p_entry->dsi, 4);
         logout(LOG_VERBOSE_LVL_INFO,"Frequency index = %d\n", p_adts_writer->sample_entries[i].frequency_index);
-        ASSURE( p_adts_writer->sample_entries[i].frequency_index < 15, 
+        ASSURE( p_adts_writer->sample_entries[i].frequency_index < 15,
                 ("explicit frequency (%" PRIu8 " is unsupported", p_adts_writer->sample_entries[i].frequency_index) );
 
         p_adts_writer->sample_entries[i].channel_config = read_bits(&pos, p_entry->dsi, 4);
@@ -688,7 +688,7 @@ adts_writer_sample_ready(es_sink_t p_es_sink,
             break;
         }
     }
-    ASSURE( i < p_adts_writer->num_sample_entries, 
+    ASSURE( i < p_adts_writer->num_sample_entries,
             ("Sample description index %" PRIu16 " is unknown", p_adts_writer->sample_entries[i].sample_description_index) );
 
     pos = write_bits(pos, header, 12, 0xFFF);            /* sync */
@@ -725,9 +725,9 @@ int adts_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_
     (*p_es_sink)->subsample_ready = NULL;
     (*p_es_sink)->sample_entry = adts_writer_sample_entry;
     (*p_es_sink)->destroy = adts_writer_destroy;
-    
 
-    p_adts_writer = (adts_writer_t) *p_es_sink; 
+
+    p_adts_writer = (adts_writer_t) *p_es_sink;
 
     p_adts_writer->track_ID = track_ID;
 
@@ -742,7 +742,7 @@ int adts_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_
             folder_len = (int)strlen(output_folder);
             n -=  folder_len;
         }
-        
+
         if (track_ID > 0)
         {
             ASSURE( snprintf(filename + folder_len, n, "out_%" PRIu32 ".adts", track_ID) < n,
@@ -819,11 +819,11 @@ h264_writer_destroy(es_sink_t p_es_sink)
         for (i = 0; i < p_h264_writer->num_sample_entries; i++)
         {
             uint32_t k;
-            for (k = 0; k < p_h264_writer->sample_entries[i].num_sps; k++) 
+            for (k = 0; k < p_h264_writer->sample_entries[i].num_sps; k++)
             {
                 free( p_h264_writer->sample_entries[i].sps[k].buf );
             }
-            for (k = 0; k < p_h264_writer->sample_entries[i].num_pps; k++) 
+            for (k = 0; k < p_h264_writer->sample_entries[i].num_pps; k++)
             {
                 free( p_h264_writer->sample_entries[i].pps[k].buf );
             }
@@ -861,8 +861,8 @@ h264_writer_sample_entry(es_sink_t p_es_sink,
          */
 
 		/* (default). Real value is given by <QualityLevl NALUnitLengthField=...>*/
-        p_h264_writer->sample_entries[i].size_field = 3; 
-        
+        p_h264_writer->sample_entries[i].size_field = 3;
+
 		p_h264_writer->sample_entries[i].num_sps = 1;
         logout(LOG_VERBOSE_LVL_INFO,"syncword = %d\n", read_bits(&pos, p_entry->dsi, 32));
     }
@@ -880,7 +880,7 @@ h264_writer_sample_entry(es_sink_t p_es_sink,
     }
     logout(LOG_VERBOSE_LVL_INFO,"num_sps = %d\n", p_h264_writer->sample_entries[i].num_sps);
 
-    for (k = 0; k < p_h264_writer->sample_entries[i].num_sps; k++) 
+    for (k = 0; k < p_h264_writer->sample_entries[i].num_sps; k++)
     {
         uint32_t length;
         uint32_t offset;
@@ -928,9 +928,9 @@ h264_writer_sample_entry(es_sink_t p_es_sink,
     {
         p_h264_writer->sample_entries[i].num_pps = read_bits(&pos, p_entry->dsi, 8);
     }
-    logout(LOG_VERBOSE_LVL_INFO,"num_pps = %d\n", p_h264_writer->sample_entries[i].num_pps);  
+    logout(LOG_VERBOSE_LVL_INFO,"num_pps = %d\n", p_h264_writer->sample_entries[i].num_pps);
 
-    for (k = 0; k < p_h264_writer->sample_entries[i].num_pps; k++) 
+    for (k = 0; k < p_h264_writer->sample_entries[i].num_pps; k++)
     {
         uint32_t length;
         uint32_t offset;
@@ -1010,7 +1010,7 @@ h264_writer_sample_ready(es_sink_t p_es_sink,
             break;
         }
     }
-    ASSURE( i < p_h264_writer->num_sample_entries, 
+    ASSURE( i < p_h264_writer->num_sample_entries,
             ("Sample description index %" PRIu16 " is unknown", sample->sample_description_index) );
 
     size_field = p_h264_writer->sample_entries[i].size_field + 1;
@@ -1027,7 +1027,7 @@ h264_writer_sample_ready(es_sink_t p_es_sink,
         in_pos += size_field;
         pos = 0;
 
-        ASSURE( in_pos + nal_size <= sample->size, 
+        ASSURE( in_pos + nal_size <= sample->size,
                 ("NAL size (%" PRIu32 ") exceeds remaining data (%" PRIu32 " bytes)",
                  nal_size, sample->size - in_pos) );
 
@@ -1075,9 +1075,9 @@ int h264_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_
     (*p_es_sink)->subsample_ready = NULL;
     (*p_es_sink)->sample_entry = h264_writer_sample_entry;
     (*p_es_sink)->destroy = h264_writer_destroy;
-    
 
-    p_h264_writer = (h264_writer_t) *p_es_sink; 
+
+    p_h264_writer = (h264_writer_t) *p_es_sink;
 
     p_h264_writer->track_ID = track_ID;
     p_h264_writer->wrote_sps_pps = 0;
@@ -1092,7 +1092,7 @@ int h264_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_
             folder_len = (int)strlen(output_folder);
             n -=  folder_len;
         }
-        
+
         if (track_ID > 0)
         {
             ASSURE( snprintf(filename + folder_len, n, "out_%" PRIu32 ".h264", track_ID) < n,
@@ -1173,15 +1173,15 @@ hevc_writer_destroy(es_sink_t p_es_sink)
         for (i = 0; i < p_hevc_writer->num_sample_entries; i++)
         {
             uint32_t k;
-            for (k = 0; k < p_hevc_writer->sample_entries[i].num_vps; k++) 
+            for (k = 0; k < p_hevc_writer->sample_entries[i].num_vps; k++)
             {
                 free( p_hevc_writer->sample_entries[i].vps[k].buf );
             }
-            for (k = 0; k < p_hevc_writer->sample_entries[i].num_sps; k++) 
+            for (k = 0; k < p_hevc_writer->sample_entries[i].num_sps; k++)
             {
                 free( p_hevc_writer->sample_entries[i].sps[k].buf );
             }
-            for (k = 0; k < p_hevc_writer->sample_entries[i].num_pps; k++) 
+            for (k = 0; k < p_hevc_writer->sample_entries[i].num_pps; k++)
             {
                 free( p_hevc_writer->sample_entries[i].pps[k].buf );
             }
@@ -1257,7 +1257,7 @@ hevc_writer_sample_entry(es_sink_t p_es_sink,
     {
         p_hevc_writer->sample_entries[i].num_pps = p_hevc_writer->sample_entries[i].num_sps = p_hevc_writer->sample_entries[i].num_vps = 0;
     }
-    for (k = 0; k < p_hevc_writer->sample_entries[i].numOfArrays; k++) 
+    for (k = 0; k < p_hevc_writer->sample_entries[i].numOfArrays; k++)
     {
         uint8_t NAL_unit_type;
         uint16_t numNalus;
@@ -1267,7 +1267,7 @@ hevc_writer_sample_entry(es_sink_t p_es_sink,
         logout(LOG_VERBOSE_LVL_INFO,"array_completeness = %d\n",     read_bits(&pos, p_entry->dsi, 1));
         logout(LOG_VERBOSE_LVL_INFO,"reserved = %d\n",     read_bits(&pos, p_entry->dsi, 1));
         NAL_unit_type = read_bits(&pos, p_entry->dsi, 6);
-        
+
 		if (NAL_unit_type == 32) /*VPS*/
         {
             numNalus = read_bits(&pos, p_entry->dsi, 16);
@@ -1337,7 +1337,7 @@ hevc_writer_sample_entry(es_sink_t p_es_sink,
         {
             ASSURE(1,("Not supporting NAL type!"));
         }
-        
+
     }
 
 
@@ -1397,7 +1397,7 @@ hevc_writer_sample_ready(es_sink_t p_es_sink,
             break;
         }
     }
-    ASSURE( i < p_hevc_writer->num_sample_entries, 
+    ASSURE( i < p_hevc_writer->num_sample_entries,
             ("Sample description index %" PRIu16 " is unknown", sample->sample_description_index) );
 
     size_field = p_hevc_writer->sample_entries[i].size_field + 1;
@@ -1417,7 +1417,7 @@ hevc_writer_sample_ready(es_sink_t p_es_sink,
         in_pos += size_field;
         pos = 0;
 
-        ASSURE( in_pos + nal_size <= sample->size, 
+        ASSURE( in_pos + nal_size <= sample->size,
               ("NAL size (%" PRIu32 ") exceeds remaining data (%" PRIu32 " bytes)",
                nal_size, sample->size - in_pos) );
 
@@ -1468,7 +1468,7 @@ cleanup:
     return err;
 }
 
-int 
+int
 hevc_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_name, const char *output_folder, uint32_t stdout_flag)
 {
     hevc_writer_t p_hevc_writer;
@@ -1479,9 +1479,9 @@ hevc_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_name
     (*p_es_sink)->subsample_ready = NULL;
     (*p_es_sink)->sample_entry = hevc_writer_sample_entry;
     (*p_es_sink)->destroy = hevc_writer_destroy;
-    
 
-    p_hevc_writer = (hevc_writer_t) *p_es_sink; 
+
+    p_hevc_writer = (hevc_writer_t) *p_es_sink;
 
     p_hevc_writer->track_ID = track_ID;
     p_hevc_writer->wrote_vps_sps_pps = 0;
@@ -1497,7 +1497,7 @@ hevc_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_name
             folder_len = (int)strlen(output_folder);
             n -=  folder_len;
         }
-        
+
         if (track_ID > 0)
         {
             ASSURE( snprintf(filename + folder_len, n, "out_%" PRIu32 ".h265", track_ID) < n,
@@ -1611,7 +1611,7 @@ subt_writer_subsample_ready(uint32_t subsample_index,
         ASSURE( p_es_writer->subsample_out_file != NULL, ("Failed to open %s for writing", filename) );
         ASSURE( fwrite(payload, size, 1, p_es_writer->subsample_out_file) == 1,
               ("Failed to write %" PRIu32 " bytes to output", size) );
-        fclose(p_es_writer->subsample_out_file);    
+        fclose(p_es_writer->subsample_out_file);
         p_es_writer->subsample_out_file = NULL;
     }
     else
@@ -1653,7 +1653,7 @@ subt_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream_name
             folder_len = (int)strlen(output_folder);
             n -=  folder_len;
         }
-        
+
         if (track_ID > 0)
         {
             ASSURE( snprintf(filename + folder_len, n, "out_%" PRIu32 ".xml", track_ID) < n,
@@ -1673,7 +1673,7 @@ cleanup:
     return err;
 }
 
-int 
+int
 sink_sample_entry (es_sink_t sink, const mp4d_sampleentry_t * p_entry)
 {
     if (sink != NULL && sink->sample_entry!= NULL)
@@ -1686,7 +1686,7 @@ sink_sample_entry (es_sink_t sink, const mp4d_sampleentry_t * p_entry)
 }
 
 
-int 
+int
 sink_sample_ready (
     es_sink_t sink,
     const mp4d_sampleref_t *p_sample,
@@ -1702,7 +1702,7 @@ sink_sample_ready (
 
 }
 
-int 
+int
 sink_subsample_ready (
     uint32_t subsample_index,
     es_sink_t sink,
@@ -1721,7 +1721,7 @@ sink_subsample_ready (
 
 }
 
-void 
+void
 sink_destroy (es_sink_t sink)
 {
     if (sink != NULL && sink->destroy!= NULL)
@@ -1803,14 +1803,14 @@ dv_el_writer_sample_ready(es_sink_t p_es_sink,
         in_pos += size_field;
         pos = 0;
 
-        ASSURE( in_pos + nal_size <= sample->size, 
+        ASSURE( in_pos + nal_size <= sample->size,
                 ("NAL size (%" PRIu32 ") exceeds remaining data (%" PRIu32 " bytes)",
                  nal_size, sample->size - in_pos) );
         ASSURE( fwrite("\0\0\0\1", 4, 1, p_dv_writer->out_file) == 1,
                 ("Failed to write 4 bytes to output file") );
         ASSURE( fwrite(payload + in_pos, nal_size, 1, p_dv_writer->out_file) == 1,
                 ("Failed to fwrite %" PRId32 " bytes to file", nal_size - size_field) );
-        
+
 
         in_pos += nal_size;
     }
@@ -1845,7 +1845,7 @@ int dv_el_writer_new(es_sink_t *p_es_sink, uint32_t track_ID, const char *stream
         (*p_es_sink)->destroy = dv_el_writer_destroy;
     }
 
-    p_dv_writer = (dv_writer_t) *p_es_sink; 
+    p_dv_writer = (dv_writer_t) *p_es_sink;
 
     p_dv_writer->track_ID = track_ID;
     {
@@ -1918,18 +1918,18 @@ int dv_bl_el_writer_new(es_sink_t *p_bl_es_sink, es_sink_t *p_el_es_sink, uint32
         }
 
            *p_el_es_sink = malloc(sizeof(struct dv_writer_t_));
-        p_dv_writer = (dv_writer_t) *p_el_es_sink; 
+        p_dv_writer = (dv_writer_t) *p_el_es_sink;
 
         (*p_el_es_sink)->sample_ready = dv_el_writer_sample_ready;
         (*p_el_es_sink)->subsample_ready = NULL;
         (*p_el_es_sink)->sample_entry = dv_el_writer_sample_entry;
         (*p_el_es_sink)->destroy = dv_el_writer_destroy;
 
-        p_dv_writer = (dv_writer_t) *p_el_es_sink; 
+        p_dv_writer = (dv_writer_t) *p_el_es_sink;
         if (MP4D_FOURCC_EQ(codec_type, "avc1"))
         {
             *p_bl_es_sink = malloc(sizeof(struct h264_writer_t_));
-            p_h264_writer = (h264_writer_t) *p_bl_es_sink; 
+            p_h264_writer = (h264_writer_t) *p_bl_es_sink;
             (*p_bl_es_sink)->sample_ready = h264_writer_sample_ready;
             (*p_bl_es_sink)->subsample_ready = NULL;
             (*p_bl_es_sink)->sample_entry = h264_writer_sample_entry;
@@ -1944,7 +1944,7 @@ int dv_bl_el_writer_new(es_sink_t *p_bl_es_sink, es_sink_t *p_el_es_sink, uint32
         else
         {
             *p_bl_es_sink = malloc(sizeof(struct hevc_writer_t_));
-            p_hevc_writer = (hevc_writer_t) *p_bl_es_sink; 
+            p_hevc_writer = (hevc_writer_t) *p_bl_es_sink;
             (*p_bl_es_sink)->sample_ready = hevc_writer_sample_ready;
             (*p_bl_es_sink)->subsample_ready = NULL;
             (*p_bl_es_sink)->sample_entry = hevc_writer_sample_entry;

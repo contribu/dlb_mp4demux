@@ -17,7 +17,7 @@
  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
  * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************************************/
@@ -93,20 +93,20 @@ struct es_sink_t_
     void (*destroy) (es_sink_t);
 };
 
-int 
+int
 sink_sample_entry (
     es_sink_t,
     const mp4d_sampleentry_t *);
 
 
-int 
+int
 sink_sample_ready (
     es_sink_t,
     const mp4d_sampleref_t *p_sample,
     const unsigned char *payload   /**< Sample buffer whose size is p_sample->size */
     );
 
-int 
+int
 sink_subsample_ready (
     uint32_t subsample_index,
     es_sink_t,
@@ -116,7 +116,7 @@ sink_subsample_ready (
     uint32_t size                     /**< in bytes */
     );
 
-void 
+void
 sink_destroy (
     es_sink_t
     );
@@ -128,7 +128,8 @@ es_writer_new(
     es_sink_t *,    /**< [out] */
     uint32_t track_ID,
     const char *stream_name,
-    const char *output_folder
+    const char *output_folder,
+    const char *extension
     );
 
 int
@@ -163,21 +164,21 @@ h264_validator_new(
     const char *output_folder
     );
 
-int 
+int
 dv_el_writer_new(
     es_sink_t *,     /**< [out] */
-    uint32_t track_ID, 
-    const char *stream_name, 
-    const char *codec_type, 
+    uint32_t track_ID,
+    const char *stream_name,
+    const char *codec_type,
     const char *output_folder
     );
 
-int 
+int
 dv_el_validator_new(
     es_sink_t *,     /**< [out] */
-    uint32_t track_ID, 
-    const char *stream_name, 
-    const char *codec_type, 
+    uint32_t track_ID,
+    const char *stream_name,
+    const char *codec_type,
     const char *output_folder
     );
 
@@ -218,26 +219,26 @@ subt_writer_new(
 
 int
 ddp_writer_new(
-    es_sink_t *p_es_sink, 
-    uint32_t track_ID, 
-    const char *stream_name, 
+    es_sink_t *p_es_sink,
+    uint32_t track_ID,
+    const char *stream_name,
     const char *output_folder);
 
 /* DD+ ES Validator */
-int 
+int
 ddp_validator_new(
-    es_sink_t *, 
-    uint32_t track_ID, 
-    const char *stream_name, 
+    es_sink_t *,
+    uint32_t track_ID,
+    const char *stream_name,
     const char *output_folder,
     int b_check_joc_flag);
 
 /* AC4 ES Validator */
-int 
+int
 ac4_validator_new(
-    es_sink_t *, 
-    uint32_t track_ID, 
-    const char *stream_name, 
+    es_sink_t *,
+    uint32_t track_ID,
+    const char *stream_name,
     const char *output_folder);
 
 #ifdef __cplusplus
