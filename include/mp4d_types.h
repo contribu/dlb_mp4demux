@@ -17,7 +17,7 @@
  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
  * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************************************/
@@ -88,13 +88,13 @@ typedef struct mp4d_boxref_t_ {
 
     Any sample can have one or more auxillary data sets. Those data sets
     are used e.g. to store sample dependent decryption information like
-    IVs and the ranges in H.264 samples that remain unencrypted. The 
+    IVs and the ranges in H.264 samples that remain unencrypted. The
     corresponding boxes are 'saiz' and 'saio'.
 */
 typedef struct mp4d_auxref_t_ {
     uint32_t datatype;/**< aux type as defined in 'saiz' */
     uint64_t pos;     /**< position in input buffer */
-    uint8_t size;    /**< size of sample in octets, or zero 
+    uint8_t size;    /**< size of sample in octets, or zero
                           if no sample aux info is available */
 } mp4d_auxref_t;
 
@@ -103,7 +103,7 @@ typedef struct mp4d_auxref_t_ {
 
     Any sample can have one senc data sets if it's encrypted in UV file. Those data sets
     are used e.g. to store sample necryption information like
-    IV and clear data encrypted data in H.264 subsample. 
+    IV and clear data encrypted data in H.264 subsample.
 */
 typedef struct mp4d_sencref_t_ {
     unsigned char iv[16];
@@ -121,7 +121,7 @@ typedef struct mp4d_sencref_t_ {
 typedef struct mp4d_sampleref_t_ {
     uint64_t dts;     /**< decoding time stamp in media time scale,
                          relative to the beginning of the presentation */
-    uint64_t cts;     /**< composition time stamp in media time scale, 
+    uint64_t cts;     /**< composition time stamp in media time scale,
                          relative to the beginning of the presentation */
     uint32_t flags;   /**< sample flags */
     uint64_t pos;     /**< position in input buffer */
@@ -165,7 +165,7 @@ typedef struct mp4d_stream_info_t_ {
     uint32_t tkhd_width;  /**< width parameter in track header */
     uint32_t tkhd_height; /**< height parameter in track header */
     uint32_t vmhd_flag;
-
+    int32_t tkhd_matrix[9];
 } mp4d_stream_info_t;
 
 
@@ -238,7 +238,7 @@ typedef struct mp4d_sampleentry_audio_t_ {
     uint16_t samplesize;
     uint32_t samplerate;
     uint32_t qtflags;
-    uint16_t sound_version;    
+    uint16_t sound_version;
     uint32_t packetsize;     /**< Only available for streaming case, derive from manifest */
     uint32_t bitrate;        /**< Only available for streaming case, derive from manifest */
     uint32_t timescale;

@@ -17,7 +17,7 @@
  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
  * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************************************/
@@ -50,7 +50,7 @@ mp4d_parse_ftyp
 {
     uint64_t n;
     mp4d_demuxer_ptr_t p_dmux = p_nav->p_data;
-    mp4d_buffer_t p = mp4d_atom_to_buffer(&atom);    
+    mp4d_buffer_t p = mp4d_atom_to_buffer(&atom);
     mp4d_read_fourcc(&p, p_dmux->curr.ftyp.info.major_brand);
     p_dmux->curr.ftyp.info.minor_version = mp4d_read_u32(&p);
     n = (atom.size - 8) / 4;
@@ -70,13 +70,13 @@ mp4d_parse_pdin
     mp4d_demuxer_ptr_t p_dmux = p_nav->p_data;
     mp4d_buffer_t p = mp4d_atom_to_buffer(&atom);
     mp4d_pdin_t *p_pdin = &p_dmux->curr.pdin;
-    mp4d_buffer_t startbuf;    
+    mp4d_buffer_t startbuf;
     uint8_t version;
     uint32_t flags;
-    
+
     version = mp4d_read_u8(&p);
     flags = mp4d_read_u24(&p);
-    
+
     p_pdin->lower.initial_delay = (uint32_t)-1; /* "infinite" delay at ... */
     p_pdin->lower.rate = 0;                     /* ... at zero rate */
     p_pdin->upper.initial_delay = 0;            /* zero delay at ... */
@@ -87,7 +87,7 @@ mp4d_parse_pdin
         int found_upper_rate = 0;
         int found_lower_rate = 0;
         uint32_t t;
-        
+
         ASSURE( (uint32_t)(p.size / 8) == p.size / 8, MP4D_E_UNSUPPRTED_FORMAT, ("Too many (%" PRIu64 ") pdin entries", p.size / 8 ));
         p_pdin->num_pdin_infos = (uint32_t) (p.size / 8);
 
@@ -117,7 +117,7 @@ mp4d_parse_pdin
             p_pdin->upper = p_pdin->lower;
             p_pdin->lower.initial_delay = (uint32_t)-1; /* "infinite" delay at ... */
             p_pdin->lower.rate = 0;                     /* ... at zero rate */
-            
+
             p = startbuf;
             for (t=0; t<p_pdin->num_pdin_infos; t++) {
                 rate = mp4d_read_u32(&p);
@@ -130,14 +130,14 @@ mp4d_parse_pdin
                 }
             }
         }
-        
+
         /* there was no lower entry for interpolation (rate < req_rate),
          search for a 2nd upper entry for extrapolation */
         if (t>0 && found_lower_rate==0) {
             p_pdin->lower = p_pdin->upper;
             p_pdin->upper.initial_delay = 0;   /* zero delay at ... */
             p_pdin->upper.rate = (uint32_t)-1; /* ... at "infinite" rate */
-            
+
             p = startbuf;
             for (t=0; t<p_pdin->num_pdin_infos; t++) {
                 rate = mp4d_read_u32(&p);
@@ -165,36 +165,36 @@ mp4d_parse_bloc
     )
 {
     mp4d_demuxer_ptr_t p_dmux = p_nav->p_data;
-    mp4d_buffer_t p = mp4d_atom_to_buffer(&atom);    
+    mp4d_buffer_t p = mp4d_atom_to_buffer(&atom);
     uint8_t version;
     uint32_t flags;
-    
+
     version = mp4d_read_u8(&p);
     flags = mp4d_read_u24(&p);
-    
+
     p_dmux->curr.bloc.info.base_location = NULL;
     p_dmux->curr.bloc.info.base_location_size = 0;
     p_dmux->curr.bloc.info.purchase_location = NULL;
     p_dmux->curr.bloc.info.purchase_location_size = 0;
     p_dmux->curr.bloc.info.reserved = NULL;
-    p_dmux->curr.bloc.info.reserved_size = 0;    
-    
+    p_dmux->curr.bloc.info.reserved_size = 0;
+
     if (version==0) {
-        
+
         if (!mp4d_is_buffer_error(&p)) {
             const uint32_t entry_size = 256;
             p_dmux->curr.bloc.info.base_location = p.p_data;
             p_dmux->curr.bloc.info.base_location_size = (p.size < entry_size) ? (uint32_t) p.size : entry_size;
             mp4d_skip_bytes(&p, entry_size);
         }
-        
+
         if (!mp4d_is_buffer_error(&p)) {
             const uint32_t entry_size = 256;
             p_dmux->curr.bloc.info.purchase_location = p.p_data;
             p_dmux->curr.bloc.info.purchase_location_size = (p.size < entry_size) ? (uint32_t) p.size : entry_size;
             mp4d_skip_bytes(&p, entry_size);
         }
-        
+
         if (!mp4d_is_buffer_error(&p)) {
             const uint32_t entry_size = 512;
             p_dmux->curr.bloc.info.reserved = p.p_data;
@@ -222,7 +222,7 @@ mp4d_parse_moov
     mp4d_error_t err = MP4D_NO_ERROR;
     p_dmux->curr.moov.info.movie_dur = 0;
 
-    while (mp4d_bytes_left(&p)) 
+    while (mp4d_bytes_left(&p))
     {
         err = (mp4d_error_t)mp4d_next_atom(&p, &atom, &child);
         if (err) return err;
@@ -299,7 +299,7 @@ mp4d_parse_mehd
     return 0;
 }
 
-int 
+int
 mp4d_parse_tref
     (mp4d_atom_t atom
     ,mp4d_navigator_ptr_t p_nav
@@ -309,7 +309,7 @@ mp4d_parse_tref
     mp4d_buffer_t p = mp4d_atom_to_buffer(&atom);
     uint8_t version;
     uint32_t flags;
-    
+
     version = mp4d_read_u8(&p);
     flags = mp4d_read_u24(&p);
 
@@ -352,7 +352,13 @@ mp4d_parse_tkhd
     else {
         return MP4D_E_UNSUPPRTED_FORMAT;
     }
-    mp4d_skip_bytes(&p, 52); /* 2*4(res) + 2(lay) + 2(agrp) + 2(vol) + 2(res) + 9*4(mtx) */
+    mp4d_skip_bytes(&p, 16); /* 2*4(res) + 2(lay) + 2(agrp) + 2(vol) + 2(res) */
+    for (int i = 0; i < 9; i++) {
+        uint32_t matrix_value = mp4d_read_u32(&p);
+        if (p_dmux->curr.moov.p_trak) {
+            p_dmux->curr.moov.p_trak->info.tkhd_matrix[i] = matrix_value;
+        }
+    }
     tkhd_width = mp4d_read_u32(&p);
     tkhd_height = mp4d_read_u32(&p);
 
@@ -362,6 +368,8 @@ mp4d_parse_tkhd
         p_dmux->curr.moov.p_trak->info.tkhd_width = tkhd_width;
         p_dmux->curr.moov.p_trak->info.tkhd_height = tkhd_height;
     }
+
+
 
     ASSURE( track_id > 0, MP4D_E_INVALID_ATOM, ("tkhd:track_ID is zero") );
 
@@ -398,8 +406,8 @@ mp4d_parse_vmhd
     )
 {
     mp4d_demuxer_ptr_t p_dmux = p_nav->p_data;
-    
-	if (p_dmux->curr.moov.p_trak) 
+
+	if (p_dmux->curr.moov.p_trak)
 	{
             p_dmux->curr.moov.p_trak->info.vmhd_flag = 1;
     }
@@ -540,10 +548,10 @@ mp4d_parse_schm
     uint32_t scheme_version;
     uint8_t version;
     uint32_t flags;
-    
+
     version = mp4d_read_u8(&p);
     flags = mp4d_read_u24(&p);
-    
+
     if (version==0) {
         mp4d_read_fourcc(&p, scheme_type);
         scheme_version = mp4d_read_u32(&p);
@@ -551,12 +559,12 @@ mp4d_parse_schm
     else {
         return MP4D_E_UNSUPPRTED_FORMAT;
     }
-    
+
     if (p_dmux->curr.moov.p_trak) {
         MP4D_FOURCC_ASSIGN(p_dmux->curr.moov.p_trak->crypt.scheme_type, scheme_type);
         p_dmux->curr.moov.p_trak->crypt.scheme_version = scheme_version;
     }
-    
+
     return 0;
 }
 
@@ -573,7 +581,7 @@ mp4d_parse_encryption_entry
         p_dmux->curr.moov.p_trak->crypt.info.iv_size = mp4d_read_u8(p);
         mp4d_read(p, p_dmux->curr.moov.p_trak->crypt.info.key_id, 16);
     }
-    
+
     return mp4d_is_buffer_error(p)?MP4D_E_INVALID_ATOM:MP4D_NO_ERROR;
 }
 
@@ -586,10 +594,10 @@ mp4d_parse_tenc
     mp4d_buffer_t p = mp4d_atom_to_buffer(&atom);
     uint8_t version;
     uint32_t flags;
-    
+
     version = mp4d_read_u8(&p);
     flags = mp4d_read_u24(&p);
-    
+
     if (version==0) {
         return mp4d_parse_encryption_entry(&p, p_nav);
     }
@@ -636,7 +644,7 @@ mp4d_read_crypt_data
     {
         *p_crypt_info = p_trak->crypt.info;
     }
-    
+
     return 0;
 }
 
@@ -711,23 +719,23 @@ mp4d_parse_visual
             if (MP4D_FOURCC_EQ(child.type, "sinf")) {
                 mp4d_read_crypt_data(child, p_nav, &p_dmux->curr.moov.p_trak->sampleentry.vide.crypt_info);
                 MP4D_FOURCC_ASSIGN(p_dmux->curr.moov.p_trak->sampleentry.vide.dsi_type_cry, p_dmux->curr.moov.p_trak->info.codec);
-            } 
+            }
             else if (MP4D_FOURCC_EQ(child.type, "clap")) {
                 debug(("Ignoring 'clap'\n"));
-            } 
+            }
             else if (MP4D_FOURCC_EQ(child.type, "pasp")) {
                 mp4d_buffer_t p_buf = mp4d_atom_to_buffer(&child);
                 p_dmux->curr.moov.p_trak->sampleentry.vide.par_present = 1;
                 p_dmux->curr.moov.p_trak->sampleentry.vide.par_hspacing = mp4d_read_u32(&p_buf);
                 p_dmux->curr.moov.p_trak->sampleentry.vide.par_vspacing = mp4d_read_u32(&p_buf);
-            } 
+            }
             else if (MP4D_FOURCC_EQ(child.type, "dvcC")) {
                 /* dolby vision stream */
                 p_dmux->curr.moov.p_trak->sampleentry.vide.dv_dsi_size = child.size;
                 p_dmux->curr.moov.p_trak->sampleentry.vide.dv_dsi = child.p_data;
                 p_dmux->curr.moov.p_trak->sampleentry.vide.dvcC_flag = 1;
                 MP4D_FOURCC_ASSIGN(p_dmux->curr.moov.p_trak->sampleentry.vide.sampleentry_name, atom.type);
-            } 
+            }
             else if (MP4D_FOURCC_EQ(child.type, "avcE") || MP4D_FOURCC_EQ(child.type, "hvcE")) {
                 /* dolby vision stream */
                 if (MP4D_FOURCC_EQ(child.type, "avcE") )
@@ -740,7 +748,7 @@ mp4d_parse_visual
                 }
                 p_dmux->curr.moov.p_trak->sampleentry.vide.dv_el_dsi_size = child.size;
                 p_dmux->curr.moov.p_trak->sampleentry.vide.dv_el_dsi = child.p_data;
-            } 
+            }
             else if (no_more_children==0) {
                 MP4D_FOURCC_ASSIGN(p_dmux->curr.moov.p_trak->sampleentry.vide.dsi_type, child.type);
                 p_dmux->curr.moov.p_trak->sampleentry.vide.dsi_size = child.size;
@@ -750,7 +758,7 @@ mp4d_parse_visual
                 p_dmux->curr.moov.p_trak->sampleentry.vide.avcC_flag = 1;
                 } else if (MP4D_FOURCC_EQ(child.type, "hvcC")) {
                     p_dmux->curr.moov.p_trak->sampleentry.vide.hvcC_flag = 1;
-                } 
+                }
             }
             mp4d_skip_bytes(&p, child.header + child.size);
 
@@ -811,7 +819,7 @@ mp4d_parse_audio
         samplerate = (uint32_t)u.f;
         channelcount = mp4d_read_u32(&p); /* numAudioChannels */
         mp4d_skip_bytes(&p, 4); /* always7F000000 */
-        samplesize = mp4d_read_u32(&p); /* constBitsPerChannel */ 
+        samplesize = mp4d_read_u32(&p); /* constBitsPerChannel */
         qtflags = mp4d_read_u32(&p); /* formatSpecificFlags */
         mp4d_skip_bytes(&p, 4); /* constBytesPerAudioPacket */
         mp4d_skip_bytes(&p, 4); /* constLPCMFramesPerAudioPacket */
@@ -841,12 +849,12 @@ mp4d_parse_audio
             err = mp4d_parse_atom_header(p.p_data, p.size, &child);
             if (err) break;
 
-            if (MP4D_FOURCC_EQ(child.type, "wave")) 
+            if (MP4D_FOURCC_EQ(child.type, "wave"))
             {
                 /* QuickTime */
                 mp4d_atom_t esds;
                 mp4d_atom_t enda;
-                
+
                 /* Endiannes of sound component */
                 err = mp4d_find_atom(&child, "enda", 0, &enda);
                 if (!err)
@@ -865,12 +873,12 @@ mp4d_parse_audio
                 p_dmux->curr.moov.p_trak->sampleentry.soun.dsi = esds.p_data;
                 more_children = 0;
             }
-            else if (MP4D_FOURCC_EQ(child.type, "sinf")) 
+            else if (MP4D_FOURCC_EQ(child.type, "sinf"))
             {
                 mp4d_read_crypt_data(child, p_nav, &p_dmux->curr.moov.p_trak->sampleentry.soun.crypt_info);
                 MP4D_FOURCC_ASSIGN(p_dmux->curr.moov.p_trak->sampleentry.vide.dsi_type_cry, p_dmux->curr.moov.p_trak->info.codec);
-            } 
-            else if (more_children) 
+            }
+            else if (more_children)
             {
                 MP4D_FOURCC_ASSIGN(p_dmux->curr.moov.p_trak->sampleentry.soun.dsi_type, child.type);
                 p_dmux->curr.moov.p_trak->sampleentry.soun.dsi_size = child.size;
@@ -899,7 +907,7 @@ mp4d_parse_subtitle
     mp4d_skip_bytes(&p, 6); /* reserved */
     data_reference_index = mp4d_read_u16(&p);
     /* Subtitle Sample Entry */
-    
+
     if (p_dmux->curr.moov.p_trak) {
         p_dmux->curr.moov.p_trak->sampleentry.subt.data_reference_index = data_reference_index;
     }
@@ -934,16 +942,16 @@ mp4d_parse_xmlmeta
     mp4d_demuxer_ptr_t p_dmux = p_nav->p_data;
     mp4d_buffer_t p = mp4d_atom_to_buffer(&atom);
     uint16_t data_reference_index;
-    
+
     mp4d_skip_bytes(&p, 6); /* reserved */
     data_reference_index = mp4d_read_u16(&p);
-    
+
     /* Metadata Sample Entry */
 
     if (p_dmux->curr.moov.p_trak) {
         p_dmux->curr.moov.p_trak->sampleentry.meta.data_reference_index = data_reference_index;
     }
-    
+
     return 0;
 }
 
@@ -1051,29 +1059,29 @@ mp4d_parse_tfra
 
     version = mp4d_read_u8(&p);
     flags = mp4d_read_u24(&p);
-    
+
     if (version!=1 && version!=0) {
         return MP4D_E_UNSUPPRTED_FORMAT;
     }
-    
+
     track_id = mp4d_read_u32(&p);
-    
+
     if (track_id == p_mfra->track_id) {
         uint32_t sizes;
         uint32_t num_entries;
         uint32_t t;
-        
+
         sizes = mp4d_read_u32(&p);
         num_entries = mp4d_read_u32(&p);
-        
-        for (t=0; t<num_entries; t++) 
+
+        for (t=0; t<num_entries; t++)
         {
             uint64_t time;
             uint64_t offs;
 
             time = (version==1) ? mp4d_read_u64(&p) : mp4d_read_u32(&p);
             offs = (version==1) ? mp4d_read_u64(&p) : mp4d_read_u32(&p);
-            if (time <= p_mfra->timestamp && offs > p_mfra->pos) 
+            if (time <= p_mfra->timestamp && offs > p_mfra->pos)
             {
                 p_mfra->pos = offs;
                 p_mfra->pos_time = time;
@@ -1102,13 +1110,13 @@ mp4d_parse_udta
         p_dmux->md.udta = atom;
     }
 
-    while (mp4d_bytes_left(&p)) 
+    while (mp4d_bytes_left(&p))
     {
         err = mp4d_next_atom(&p, &atom, &child);
         if (err) return err;
 
         if (MP4D_FOURCC_EQ(child.type, "uuid") ||
-            MP4D_FOURCC_EQ(child.type, "meta")) 
+            MP4D_FOURCC_EQ(child.type, "meta"))
         {
             /* look for meta in udta (iTunes) or in uuid (Dolby) */
             err = mp4d_dispatch(child, p_nav);
@@ -1117,7 +1125,7 @@ mp4d_parse_udta
                 return 0;
             }
         }
-        else if (MP4D_FOURCC_EQ(child.type, p_dmux->md.req_type)) 
+        else if (MP4D_FOURCC_EQ(child.type, p_dmux->md.req_type))
         {
             /* look for child type (3GP Asset Information) */
             p_dmux->md.atom_out = child;
@@ -1137,17 +1145,17 @@ mp4d_parse_meta
     mp4d_demuxer_ptr_t p_dmux = p_nav->p_data;
     mp4d_buffer_t p = mp4d_atom_to_buffer(&atom);
     mp4d_error_t err = MP4D_NO_ERROR;
-    
+
     uint8_t version;
     uint32_t flags;
-    
+
     version = mp4d_read_u8(&p);
     flags = mp4d_read_u24(&p);
-    
+
     if (version==0) {
         atom.p_data = p.p_data;
         atom.size   = p.size;
-        
+
         MP4D_FOURCC_ASSIGN(p_dmux->meta.hdlr.handler_type, "\0\0\0\0");
         err = mp4d_find_hdlr(atom, p_nav);
         if (err) return err;
@@ -1157,7 +1165,7 @@ mp4d_parse_meta
             MP4D_FOURCC_EQ(p_dmux->meta.hdlr.handler_type, "dlbt") ||
             MP4D_FOURCC_EQ(p_dmux->meta.hdlr.handler_type, "dlbf") ||
             MP4D_FOURCC_EQ(p_dmux->meta.hdlr.handler_type, "dlbk") ||
-            MP4D_FOURCC_EQ(p_dmux->meta.hdlr.handler_type, "dlbm")) 
+            MP4D_FOURCC_EQ(p_dmux->meta.hdlr.handler_type, "dlbm"))
         {
             err = mp4d_find_atom(&atom, "xml ", 0, &p_dmux->meta.data);
         }
@@ -1173,7 +1181,7 @@ mp4d_parse_meta
         if (err) {
             mp4d_memset(&p_dmux->meta.data, 0, sizeof(p_dmux->meta.data));
         }
-                
+
         return 0;
     }
 
@@ -1184,12 +1192,12 @@ mp4d_parse_meta
 
 
 /**************************************************
-    Low Level 
+    Low Level
 **************************************************/
 
 
 
-static const mp4d_callback_t k_main_dispatcher_list[] = 
+static const mp4d_callback_t k_main_dispatcher_list[] =
 {
     {"ftyp", &mp4d_parse_ftyp},
     {"styp", &mp4d_parse_ftyp},
@@ -1217,7 +1225,7 @@ static const mp4d_callback_t k_main_dispatcher_list[] =
 
 };
 
-static const mp4d_callback_t k_trak_dispatcher_list[] = 
+static const mp4d_callback_t k_trak_dispatcher_list[] =
 {
     {"tkhd", &mp4d_parse_tkhd},
     {"tref", &mp4d_parse_tref},
@@ -1228,28 +1236,28 @@ static const mp4d_callback_t k_trak_dispatcher_list[] =
     {"vmhd", &mp4d_parse_vmhd},
     {"stbl", &mp4d_parse_box},
     {"stsd", &mp4d_parse_stsd},
-    
+
     /*encryption*/
     {"sinf", &mp4d_parse_box},
     {"frma", &mp4d_parse_frma},
     {"schm", &mp4d_parse_schm},
     {"schi", &mp4d_parse_box},
     {"tenc", &mp4d_parse_tenc},
-    
+
     /* sentinel */
     {"dumy", NULL}
 };
 
-static const mp4d_callback_t k_uuid_dispatcher_list[] = 
+static const mp4d_callback_t k_uuid_dispatcher_list[] =
 {
     {"DLBY-METADATA-00", &mp4d_parse_box},
-    
+
     /* encryption */
     {"\x89\x74\xdb\xce\x7b\xe7\x4c\x51\x84\xf9\x71\x48\xf9\x88\x25\x54", &mp4d_parse_tenc}, /* Microsoft 'tenc'*/
-    
+
     /* sentinel */
     {"dumy", NULL}
-    
+
 };
 
 
@@ -1273,15 +1281,15 @@ mp4d_get_version(void)
 }
 
 int
-mp4d_demuxer_parse 
+mp4d_demuxer_parse
     (mp4d_demuxer_ptr_t p_dmux
     ,const unsigned char *buffer       /**< input buffer */
     ,uint64_t size         /**< input buffer size */
-    ,int is_eof            /**< Indicate this buffer holds all data until the end of the file. 
+    ,int is_eof            /**< Indicate this buffer holds all data until the end of the file.
         This information is needed to parse boxes indicating size=0. */
     ,uint64_t ref_offs      /**< Set the reference offset for this buffer relative to the input file. */
-    ,uint64_t *box_size_out   /**< Returns the size of the top level box. In case of a failure 
-        this helps refilling the input buffer with the required number of data. box_size_out==0 
+    ,uint64_t *box_size_out   /**< Returns the size of the top level box. In case of a failure
+        this helps refilling the input buffer with the required number of data. box_size_out==0
         indicates that the is_eof flag needs to be set for successful parsing. */
     )
 {
@@ -1294,7 +1302,7 @@ mp4d_demuxer_parse
     mp4d_memset(&p_dmux->curr, 0, sizeof(p_dmux->curr));
 
     p_dmux->track_cnt = 0;
-    
+
     err = mp4d_parse_atom_header(buffer, size, &p_dmux->atom);
 
     if (size < p_dmux->atom.header) {
@@ -1318,7 +1326,7 @@ mp4d_demuxer_parse
 
 
 int
-mp4d_demuxer_get_type 
+mp4d_demuxer_get_type
     (mp4d_demuxer_ptr_t p_dmux
     ,mp4d_fourcc_t *type_out
     )
@@ -1344,7 +1352,7 @@ mp4d_demuxer_get_atom(
 }
 
 int
-mp4d_demuxer_get_movie_info 
+mp4d_demuxer_get_movie_info
     (mp4d_demuxer_ptr_t p_dmux
     ,mp4d_movie_info_t *movie_info_out
     )
@@ -1404,14 +1412,14 @@ mp4d_demuxer_get_stream_info
     mp4d_memset(p_dmux->curr.moov.p_trak, 0, sizeof(mp4d_trak_t));
 
     err = mp4d_demuxer_read_track_info(p_dmux, stream_num);
-    
+
     ASSURE( p_dmux->curr.moov.p_trak->info.track_id > 0, MP4D_E_INVALID_ATOM, ("Illegal track_ID = 0") );
 
     if (!err)
     {
         *p_stream_info = p_dmux->curr.moov.p_trak->info;
     }
-    
+
     return err;
 }
 
@@ -1445,7 +1453,7 @@ mp4d_demuxer_get_sampleentry
     p_dmux->curr.moov.p_trak = &p_dmux->p_scratch->trak;
     mp4d_memset(p_dmux->curr.moov.p_trak, 0, sizeof(mp4d_trak_t));
     p_dmux->curr.moov.p_trak->sampleentry_req_idx = sample_description_index;
-    
+
     err = mp4d_demuxer_read_track_info(p_dmux, stream_num);
 
     if (err != MP4D_NO_ERROR)
@@ -1470,7 +1478,7 @@ mp4d_demuxer_get_sampleentry
             *p_sampleentry = p_dmux->curr.moov.p_trak->sampleentry;
         }
     }
-    
+
     return err;
 }
 
@@ -1507,13 +1515,13 @@ mp4d_demuxer_fragment_for_time
         *p_time = 0;
         return MP4D_NO_ERROR;
     }
-    
+
     {
         struct mp4d_navigator_t_ nav;
         mp4d_navigator_init(&nav, cb, NULL, &data);
         CHECK( mp4d_parse_box(atom, &nav) );
     }
-    
+
     *p_pos  = data.pos;
     *p_time = data.pos_time;
 
@@ -1662,7 +1670,7 @@ mp4d_demuxer_get_sidx_offset
 
 
 int
-mp4d_demuxer_read_mfro 
+mp4d_demuxer_read_mfro
     (const unsigned char *buffer
     ,uint64_t size
     ,uint64_t *p_mfra_size
@@ -1673,24 +1681,24 @@ mp4d_demuxer_read_mfro
 
     if (!buffer || !p_mfra_size)
         return MP4D_E_WRONG_ARGUMENT;
-    
+
     *p_mfra_size = 0;
-    
+
     if (size < 16) {
         return MP4D_E_BUFFER_TOO_SMALL;
     }
 
     err = mp4d_parse_atom_header(buffer+size-16, 16, &mfro);
     if (err) return err;
-    
+
     if (MP4D_FOURCC_EQ(mfro.type,"mfro")) {
         mp4d_buffer_t p = mp4d_atom_to_buffer(&mfro);
         uint8_t version;
         uint32_t flags;
-        
+
         version = mp4d_read_u8(&p);
         flags = mp4d_read_u24(&p);
-        
+
         if (version==0) {
             *p_mfra_size = mp4d_read_u32(&p);
         }
@@ -1719,7 +1727,7 @@ mp4d_demuxer_get_ftyp_info
                     p_dmux->atom.type[3]) );
 
     *p_ftyp_info = p_dmux->curr.ftyp.info;
-    
+
     return 0;
 }
 
@@ -1738,7 +1746,7 @@ mp4d_demuxer_get_bloc_info
     else {
         return MP4D_E_INFO_NOT_AVAIL;
     }
-    
+
     return 0;
 }
 
@@ -1804,7 +1812,7 @@ mp4d_parse_meta_iloc(mp4d_atom_t atom,
 
     mp4d_read_u24(&p); /* flags */
 
-    while (mp4d_bytes_left(&p)) 
+    while (mp4d_bytes_left(&p))
     {
         mp4d_atom_t child;
         CHECK( mp4d_next_atom(&p, NULL, &child) );
@@ -1889,7 +1897,7 @@ mp4d_parse_iloc(mp4d_atom_t atom,
             case 8: mp4d_read_u64(&p); break;
             default: assert( 0 ); break;
             }
-            
+
             /* extent_offset */
             switch (offset_size)
             {
@@ -1941,7 +1949,7 @@ mp4d_demuxer_get_meta_item
     };
     struct mp4d_navigator_t_ nav;
     struct iloc_parse_t_ data;
-    
+
     ASSURE( p_dmux != NULL, MP4D_E_WRONG_ARGUMENT, ("Null pointer") );
     ASSURE( p_item != NULL, MP4D_E_WRONG_ARGUMENT, ("Null pointer") );
     ASSURE( p_size != NULL, MP4D_E_WRONG_ARGUMENT, ("Null pointer") );
@@ -1983,7 +1991,7 @@ mp4d_demuxer_get_pdin_pair
     )
 {
     mp4d_error_t err = 0;
-    
+
     if (!p_dmux || !p_lower || !p_upper)
         return MP4D_E_WRONG_ARGUMENT;
 
@@ -1997,7 +2005,7 @@ mp4d_demuxer_get_pdin_pair
     else {
         return MP4D_E_INFO_NOT_AVAIL;
     }
-    
+
     return err;
 }
 
@@ -2010,7 +2018,7 @@ mp4d_select_metadata
     )
 {
     mp4d_error_t err = 0;
-    
+
     p_dmux->md.req_idx = 0;
     if (MP4D_FOURCC_EQ(md4cc, p_meta->hdlr.handler_type)) {
         ATOM2BOXREF(p_box, &p_meta->data);
@@ -2027,7 +2035,7 @@ mp4d_select_metadata
             return 0;
         }
     }
-    
+
     return MP4D_E_INFO_NOT_AVAIL;
 }
 
@@ -2039,12 +2047,12 @@ mp4d_demuxer_get_metadata
     )
 {
     mp4d_fourcc_t md4cc;
-    
+
     if (!p_dmux || !p_box)
         return MP4D_E_WRONG_ARGUMENT;
-    
+
     UINT2FOURCC(md4cc, md_type);
-    
+
     if (MP4D_FOURCC_EQ(md4cc, "ainf"))
     {
         return get_ainf_info(p_dmux, p_box);
@@ -2098,7 +2106,7 @@ mp4d_demuxer_get_id3v2_tag
              p_dmux->meta.hdlr.handler_type[3]) );
 
     ASSURE( !MP4D_FOURCC_EQ(p_dmux->meta.data.type, "\0\0\0\0"), MP4D_E_IDX_OUT_OF_RANGE,
-            ("Found meta box with handler type 'ID32' but an error happened while getting the ID32 box with index %" PRIu32, 
+            ("Found meta box with handler type 'ID32' but an error happened while getting the ID32 box with index %" PRIu32,
              idx) );
 
     ASSURE( MP4D_FOURCC_EQ(p_dmux->meta.data.type, "ID32"), MP4D_E_INFO_NOT_AVAIL,
@@ -2107,7 +2115,7 @@ mp4d_demuxer_get_id3v2_tag
              p_dmux->meta.data.type[1],
              p_dmux->meta.data.type[2],
              p_dmux->meta.data.type[3]) );
-    
+
     {
         mp4d_buffer_t p = mp4d_atom_to_buffer(&p_dmux->meta.data);
         uint32_t flags;
